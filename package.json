@@ -1,0 +1,86 @@
+{
+  "name": "horizon-ui-tailwind-react-ts",
+  "version": "2.0.0",
+  "private": true,
+  "dependencies": {
+    "@chakra-ui/hooks": "^2.1.4",
+    "@chakra-ui/modal": "^2.2.9",
+    "@chakra-ui/popover": "^2.1.8",
+    "@chakra-ui/portal": "^2.0.15",
+    "@chakra-ui/system": "^2.3.5",
+    "@chakra-ui/tooltip": "^2.2.6",
+    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
+    "@ckeditor/ckeditor5-react": "^11.0.0",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@react-google-maps/api": "^2.20.7",
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
+    "@tanstack/react-table": "^8.7.9",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^25.2.3",
+    "@types/node": "^12.20.55",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "apexcharts": "^3.35.5",
+    "file-saver": "^2.0.5",
+    "html-docx-js": "^0.3.1",
+    "html2pdf.js": "^0.12.1",
+    "jspdf": "^3.0.3",
+    "leaflet": "^1.9.4",
+    "react": "19.0.0",
+    "react-apexcharts": "1.4.0",
+    "react-calendar": "^5.0.0",
+    "react-dom": "19.0.0",
+    "react-icons": "^4.4.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^6.4.0",
+    "react-scripts": "5.0.1",
+    "tailwindcss-rtl": "^0.9.0",
+    "three": "^0.181.0",
+    "typescript": "^4.7.4",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "pretty": "prettier --write \"./**/*.{js,jsx,json}\""
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/file-saver": "^2.0.7",
+    "@types/html-docx-js": "^0.3.4",
+    "@types/leaflet": "^1.9.21",
+    "@types/react-calendar": "^3.5.2",
+    "@types/react-leaflet": "^2.8.3",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/react-table": "^7.7.12",
+    "ajv": "^7.2.4",
+    "autoprefixer": "^10.4.8",
+    "postcss": "^8.4.16",
+    "prettier": "^2.8.3",
+    "prettier-plugin-tailwindcss": "^0.2.1",
+    "tailwindcss": "^3.1.8"
+  }
+}

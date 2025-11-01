@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap");
+body {
+	font-family: "DM Sans", sans-serif;
+}
+
+option {
+	color: black;
+}
+
+.overflow-y-auto {
+  scroll-behavior: smooth;
+}
+
+/* Pastikan body tidak overflow saat zoom */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Smooth transition saat sidebar buka/tutup */
+* {
+  transition: margin 0.2s ease, padding 0.2s ease;
+}
+
+/* src/index.css atau src/App.css */
+.ck-editor-container .ck-editor__editable {
+  min-height: 400px !important; /* Sesuaikan tinggi sesuai kebutuhan */
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.ck-editor-container .ck-editor__editable:focus {
+  min-height: 400px !important;
+}
