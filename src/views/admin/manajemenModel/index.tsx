@@ -64,7 +64,7 @@ const ModelsPage: React.FC = () => {
     );
   }, [models, search]);
 
-  const stats = useMemo(() => {
+  const stats: any = useMemo(() => {
     const total = models.length;
     const totalSize = models.reduce((acc, m) => acc + m.size, 0);
     return { total, totalSize: (totalSize / 1024 / 1024).toFixed(1) };
@@ -160,6 +160,7 @@ const ModelsPage: React.FC = () => {
         </div>
       </div>
 
+     
       {/* Tabel */}
       <div className="mt-5">
         <Card extra="w-full p-5">
@@ -222,10 +223,11 @@ const ModelsPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Modal 3D Viewer */}
+    {/* Modal 3D Viewer */}
       {isModalOpen && selectedModel && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[rgba(0,0,0,0.5)] p-4">
-          <div className="relative w-full max-w-5xl bg-white dark:bg-navy-800 rounded-xl shadow-2xl overflow-hidden flex flex-col h-[90vh]">
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[rgba(0,0,0,0.5)] p-4">
+          <div className="relative w-[85vw] bg-white dark:bg-navy-800 rounded-xl shadow-2xl overflow-hidden flex flex-col h-[90vh]">
+
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-navy-600">
               <h3 className="text-lg font-bold text-navy-700 dark:text-white">
@@ -239,10 +241,120 @@ const ModelsPage: React.FC = () => {
               </button>
             </div>
 
-            {/* 3D Canvas */}
-            <div className="relative flex-1 min-h-0 bg-gray-50 dark:bg-navy-900">
+            {/* ==== 3D CANVAS + DOM CARD ==== */}
+            <div className="relative flex-1 min-h-0 bg-gray-50 dark:bg-navy-900 overflow-hidden">
+
+            {/* ---------- DOM CARD (Kiri & Kanan) ---------- */}
+            <div className="absolute w-full justify-between z-[9999] inset-0 flex items-center gap-6 px-4 pointer-events-none">
+                {/* KARTU KIRI */}
+                <div className="relative left-4 w-72 md:w-80 h-48 float-container pointer-events-auto">
+                  <div
+                    className="relative w-full h-full preserve-3d transition-all duration-300 ease-out group"
+                    style={{
+                      transform: "translateY(-50%) rotateX(-20deg) rotateY(-15deg) translateZ(50px)", // Naikkan translateZ
+                      top: "50%",
+                      willChange: "transform",
+                    }}
+                    onMouseMove={e => {
+                      const card = e.currentTarget;
+                      const rect = card.getBoundingClientRect();
+                      const x = e.clientX - rect.left;
+                      const y = e.clientY - rect.top;
+                      const cx = rect.width / 2;
+                      const cy = rect.height / 2;
+                      const ry = ((x - cx) / cx) * 20 - 15;
+                      const rx = ((cy - y) / cy) * 20 - 20;
+                      card.style.transform = `translateY(-50%) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(80px) scale(1.03)`; // Efek hover lebih tinggi
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform =
+                        "translateY(-50%) rotateX(-20deg) rotateY(-15deg) translateZ(50px) scale(1)";
+                    }}
+                  >
+                    {/* CARD CONTENT */}
+                    <div className="absolute inset-0 rounded-2xl p-6 flex flex-col justify-between text-white bg-gradient-to-br from-brand-500 to-brand-700 overflow-hidden"
+                    style={{
+                        boxShadow: `
+                          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                          0 50px 100px -20px rgba(0, 0, 0, 0.4),
+              0 80px 140px -30px rgba(0, 0, 0, 0.3),
+              0 0 100px rgba(34, 197, 94, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2)
+            `
+          }}
+        >
+          <div>
+            <h4 className="text-lg font-bold tracking-tight">Model Aktif</h4>
+            <p className="text-4xl font-extrabold mt-1">20</p>
+          </div>
+          <p className="text-sm opacity-80">Sedang digunakan</p>
+        </div>
+
+        {/* GLOW BACKGROUND */}
+        <div 
+          className="absolute -inset-12 bg-emerald-500/40 rounded-full blur-3xl animate-pulse opacity-75" 
+          style={{ zIndex: -1, transform: 'translateZ(-20px)' }} 
+        />
+      </div>
+    </div>
+
+    {/* KARTU KANAN */}
+    <div className="relative right-4 w-72 md:w-80 h-48 float-container pointer-events-auto">
+      <div
+        className="relative w-full h-full preserve-3d transition-all duration-300 ease-out group"
+        style={{
+          transform: "translateY(-50%) rotateX(-20deg) rotateY(15deg) translateZ(50px)",
+          top: "50%",
+          willChange: "transform",
+        }}
+        onMouseMove={e => {
+          const card = e.currentTarget;
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const cx = rect.width / 2;
+          const cy = rect.height / 2;
+          const ry = ((x - cx) / cx) * 20 + 15;
+          const rx = ((cy - y) / cy) * 20 - 20;
+          card.style.transform = `translateY(-50%) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(80px) scale(1.03)`;
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform =
+            "translateY(-50%) rotateX(-20deg) rotateY(15deg) translateZ(50px) scale(1)";
+        }}
+      >
+        <div className="absolute inset-0 rounded-2xl p-6 flex flex-col justify-between text-white bg-gradient-to-br from-brand-500 to-brand-700 overflow-hidden"
+        style={{
+            boxShadow: `
+              0 25px 50px -12px rgba(0, 0, 0, 0.5),
+              0 50px 100px -20px rgba(0, 0, 0, 0.4),
+              0 80px 140px -30px rgba(0, 0, 0, 0.3),
+              0 0 100px rgba(34, 197, 94, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2)
+            `
+          }}
+        >
+          <div>
+            <h4 className="text-lg font-bold tracking-tight">Total Model 3D</h4>
+            <p className="text-4xl font-extrabold mt-1">{stats.total}</p>
+          </div>
+          <p className="text-sm opacity-80">
+            Ukuran: <span className="font-mono">{stats.totalSize} MB</span>
+          </p>
+        </div>
+
+        <div 
+          className="absolute -inset-12 bg-brand-500/40 rounded-full blur-3xl animate-pulse opacity-75" 
+          style={{ zIndex: -1, transform: 'translateZ(-20px)' }} 
+        />
+      </div>
+    </div>
+            </div>
+
+              {/* ---------- LOADER ---------- */}
               {isLoading && <Loader />}
 
+              {/* ---------- 3D CANVAS (R3F) ---------- */}
               <Suspense fallback={null}>
                 <ThreeDModel
                   ref={modelRef}
@@ -252,40 +364,14 @@ const ModelsPage: React.FC = () => {
                   maxDistance={maxDist}
                   autoRotate={autoRotate}
                   onCameraChange={handleCameraChange}
+                  // stats={stats}              
                 />
               </Suspense>
             </div>
 
             {/* Panel Kontrol Kamera */}
             <div className="p-4 border-t border-gray-200 dark:border-navy-600 space-y-4 bg-gray-50 dark:bg-navy-900">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold text-navy-700 dark:text-white">
-                  Kontrol Kamera
-                </h4>
-                <button
-                  onClick={resetCamera}
-                  className="text-xs px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-600 transition"
-                >
-                  Reset Kamera
-                </button>
-              </div>
-
-              {/* Auto Rotate */}
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Auto Rotate</span>
-                <button
-                  onClick={() => setAutoRotate(!autoRotate)}
-                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition ${
-                    autoRotate ? "bg-brand-500" : "bg-gray-300"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      autoRotate ? "translate-x-4" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-              </div>
+              {/* … (tidak berubah) … */}
             </div>
 
             {/* Footer */}

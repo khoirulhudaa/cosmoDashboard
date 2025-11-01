@@ -75,3 +75,33 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
   @apply w-4 h-4 bg-brand-500 rounded-full cursor-pointer border-0;
 }
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.transform-gpu {
+  transform: translateZ(40) translateY(90) translateX(90);
+}
+
+/* globals.css atau di dalam <style> di komponen */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+.float-container {
+  animation: float 4s ease-in-out infinite;
+}
