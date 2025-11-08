@@ -1,19 +1,30 @@
-// Custom components
 import React from "react";
 
-function InputField(props: {
+interface InputFieldProps {
   id: string;
   label: string;
-  extra: string;
+  extra?: string;
   placeholder: string;
   variant: string;
-  state?: string;
+  state?: "error" | "success";
   disabled?: boolean;
   type?: string;
-}) {
-  const { label, id, extra, type, placeholder, variant, state, disabled } =
-    props;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
 
+function InputField({
+  label,
+  id,
+  extra = "",
+  type = "text",
+  placeholder,
+  variant,
+  state,
+  disabled = false,
+  value,
+  onChange,
+}: InputFieldProps) {
   return (
     <div className={`${extra}`}>
       <label
@@ -29,8 +40,10 @@ function InputField(props: {
         type={type}
         id={id}
         placeholder={placeholder}
-        className={`mt-2 flex h-12 w-full items-center justify-center rounded-xl border bg-white/0 p-3 text-sm outline-none ${
-          disabled === true
+        value={value}
+        onChange={onChange}
+        className={`mt-2 flex h-12 w-full items-center justify-center rounded-xl border bg-white/0 p-3 text-sm outline-none transition-all focus:ring-2 focus:ring-brand-500/20 ${
+          disabled
             ? "!border-none !bg-gray-100 dark:!bg-white/5 dark:placeholder:!text-[rgba(255,255,255,0.15)]"
             : state === "error"
             ? "border-red-500 text-red-500 placeholder:text-red-500 dark:!border-red-400 dark:!text-red-400 dark:placeholder:!text-red-400"

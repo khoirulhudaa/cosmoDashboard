@@ -120,7 +120,7 @@ const Links = ({ routes }: LinksProps) => {
         >
           <div
             className={`
-              relative mb-4 border border-black/20 overflow-hidden backdrop-blur-2xl shadow-lg rounded-xl flex items-center px-3 py-3 pb-4 transition-colors
+              relative mb-4 border border-black/20 overflow-hidden flex items-center px-3 py-3 pb-4 transition-colors
               hover:brightness-95
               ${isActive ? "bg-blue-100 dark:bg-navy-700 text-blue-800" : ""}
             `}

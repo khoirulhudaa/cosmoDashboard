@@ -1,15 +1,68 @@
 import authImg from "assets/img/auth/auth.jpg";
 import Checkbox from "components/checkbox";
 import InputField from "components/fields/InputField";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email.trim() || !password.trim()) {
+      setError("Email dan password wajib diisi!");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("https://vr.kiraproject.id/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Simpan token
+        localStorage.setItem("token", data.data.token);
+
+        // Simpan user profile
+        localStorage.setItem("user", JSON.stringify(data.data.user));
+
+        // Redirect ke dashboard
+        navigate("/admin/default", { replace: true });
+      } else {
+        setError("Email atau password tidak sesuai.");
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan jaringan. Coba lagi nanti.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="relative grid grid-cols-2 h-[100vh] overflow-hidden w-full items-center justify-center lg:items-center lg:justify-start">
       {/* Sign in section */}
       <div className="flex items-center justify-center py-10 overflow-hidden h-full px-14">
         <div className="relative h-full p-10 shadow-lg border border-black/30 rounded-lg w-full max-w-full flex-col items-center">
-          <Link to="/admin" className="mt-0 w-max lg:pt-10">
+          <Link to="/" className="mt-0 w-max lg:pt-10">
             <div className="mx-auto flex h-fit mb-6 w-screen items-center hover:cursor-pointer">
               <svg
                 width="8"
@@ -28,58 +81,86 @@ export default function SignIn() {
               </p>
             </div>
           </Link>
+
           <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
             Masuk
           </h4>
           <p className="mb-9 ml-1 text-base text-gray-600">
-            Masukan email dan kata sandi untuk masuk!
+            Masukkan email dan kata sandi untuk masuk!
           </p>
-          {/* Email */}
-          <InputField
-            variant="auth"
-            extra="mb-3"
-            label="Email*"
-            placeholder="mail@simmmple.com"
-            id="email"
-            type="text"
-          />
 
-          {/* Password */}
-          <InputField
-            variant="auth"
-            extra="mb-3"
-            label="Password*"
-            placeholder="Min. 8 characters"
-            id="password"
-            type="password"
-          />
-          {/* Checkbox */}
-          <div className="mb-4 flex items-center justify-between px-2">
-            <div className="flex items-center">
-              <Checkbox />
-              <p className="ml-2 text-sm font-medium text-navy-700 dark:text-white">
-                Ingat saya
-              </p>
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+              {error}
             </div>
-            <a
-              className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
-              href=" "
+          )}
+
+          <form onSubmit={handleLogin}>
+            {/* Email */}
+            <InputField
+              variant="auth"
+              extra="mb-3"
+              label="Email*"
+              placeholder="mail@simmmple.com"
+              id="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            {/* Password */}
+            <InputField
+              variant="auth"
+              extra="mb-3"
+              label="Password*"
+              placeholder="Min. 8 characters"
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            {/* Checkbox & Lupa Password */}
+            <div className="mb-4 flex items-center justify-between px-2">
+              <div className="flex items-center">
+                <Checkbox
+                  checked={rememberMe}
+                  onChange={(e: any) => setRememberMe(e.target.checked)}
+                />
+                <p className="ml-2 text-sm font-medium text-navy-700 dark:text-white">
+                  Ingat saya
+                </p>
+              </div>
+              <a
+                className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white cursor-pointer"
+                onClick={(e) => e.preventDefault()}
+              >
+                Lupa kata sandi?
+              </a>
+            </div>
+
+            {/* Tombol Login */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200 ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Lupa kata sandi?
-            </a>
-          </div>
-          <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
-            Masuk sekarang
-          </button>
+              {loading ? "Memproses..." : "Masuk sekarang"}
+            </button>
+          </form>
         </div>
       </div>
 
-       <div className="relative overflow-hidden h-full">
-          <div
-            className="relative flex brightness-50 h-full w-full items-end justify-center bg-cover bg-center"
-            style={{ backgroundImage: `url(${authImg})` }}
-          />
-        </div>
+      {/* Background Image */}
+      <div className="relative overflow-hidden h-full">
+        <div
+          className="relative flex brightness-50 h-full w-full items-end justify-center bg-cover bg-center"
+          style={{ backgroundImage: `url(${authImg})` }}
+        />
+      </div>
     </div>
   );
 }

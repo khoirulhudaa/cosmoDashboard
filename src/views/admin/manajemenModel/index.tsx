@@ -50,7 +50,13 @@ const ModelsPage: React.FC = () => {
     try {
       const res = await fetch("https://vr.kiraproject.id/api/models");
       const json = await res.json();
-      if (json.success) setModels(json.data);
+      if (json.success) {
+        const secureModels = json.data.map((model: any) => ({
+          ...model,
+          fullUrl: model.fullUrl.replace(/^http:/, 'https:'),
+        }));
+        setModels(secureModels);
+      }
     } catch (err) {
       console.error("Failed to fetch models", err);
     }
@@ -353,7 +359,7 @@ const ModelsPage: React.FC = () => {
 
               {/* ---------- LOADER ---------- */}
               {isLoading && <Loader />}
-
+              
               {/* ---------- 3D CANVAS (R3F) ---------- */}
               <Suspense fallback={null}>
                 <ThreeDModel
@@ -364,14 +370,8 @@ const ModelsPage: React.FC = () => {
                   maxDistance={maxDist}
                   autoRotate={autoRotate}
                   onCameraChange={handleCameraChange}
-                  // stats={stats}              
                 />
               </Suspense>
-            </div>
-
-            {/* Panel Kontrol Kamera */}
-            <div className="p-4 border-t border-gray-200 dark:border-navy-600 space-y-4 bg-gray-50 dark:bg-navy-900">
-              {/* … (tidak berubah) … */}
             </div>
 
             {/* Footer */}

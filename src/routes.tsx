@@ -1,10 +1,11 @@
 import MainDashboard from "views/admin/default";
 
 import {
-  MdAddBox, MdAdminPanelSettings, // Beranda
+  MdAddBox, MdAdminPanelSettings, MdCardGiftcard, MdCreditCard, MdFace, // Beranda
   MdFamilyRestroom,
-  MdHome, MdMode,
-  MdPlusOne, MdScanner
+  MdHome, MdMan, MdMode,
+  MdPlusOne, MdScanner,
+  MdSimCard
 } from "react-icons/md";
 
 import HealthPage from "views/admin/healtSystem";
@@ -14,6 +15,8 @@ import QRCodesPage from "views/admin/manajemenQrCode";
 import AnalyticsPage from "views/admin/scanAnalytics";
 import AdminPage from "views/admin/manajemenAdmin";
 import SignIn from "views/auth/SignIn";
+import ProfileOverview from "views/admin/profile";
+import ARViewerPage from "views/admin/ThreeDModel/ARViewerPage";
 
 const routes: any = [
   // ==================== DASHBOARD ====================
@@ -41,20 +44,6 @@ const routes: any = [
     component: <ModelsPage />,
   },
   {
-    name: "Manajemen QrCode",
-    layout: "/admin",
-    path: "qrCode",
-    icon: <MdFamilyRestroom className="h-6 w-6" />,
-    component: <QRCodesPage />,
-  },
-  {
-    name: "Scan Analytics",
-    layout: "/admin",
-    path: "scan-analytics",
-    icon: <MdScanner className="h-6 w-6" />,
-    component: <AnalyticsPage />,
-  },
-  {
     name: "Kesehatan Sisten",
     layout: "/admin",
     path: "kesehatan-sistem",
@@ -67,6 +56,32 @@ const routes: any = [
     path: "data-admin",
     icon: <MdAdminPanelSettings className="h-6 w-6" />,
     component: <AdminPage />,
+  },
+  {
+    name: "Akun Pengguna",
+    layout: "/admin",
+    path: "profile",
+    icon: <MdFace className="h-6 w-6" />,
+    component: <ProfileOverview />,
+  },
+  {
+    name: "Manajemen QrCode",
+    layout: "/admin",
+    path: "qrCode",
+    icon: <MdFamilyRestroom className="h-6 w-6" />,
+    component: <QRCodesPage />,
+  },
+  // {
+  //   name: "Scan Analytics",
+  //   layout: "/admin",
+  //   path: "scan-analytics",
+  //   icon: <MdScanner className="h-6 w-6" />,
+  //   component: <AnalyticsPage />,
+  // },
+  {
+    layout: "/admin",
+    path: "ar",
+    component: <ARViewerPage />,
   },
   {
     layout: "/auth",

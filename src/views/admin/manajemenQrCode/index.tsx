@@ -102,13 +102,13 @@ const QRCodesPage: React.FC = () => {
                   <MdDownload className="h-4 w-4" />
                   Download
                 </button>
-                <a
+                {/* <a
                   href={qr.url}
                   target="_blank"
                   className="text-xs px-3 py-1 bg-brand-500 text-white rounded hover:bg-brand-600"
                 >
                   AR View
-                </a>
+                </a> */}
               </div>
             </div>
           </Card>

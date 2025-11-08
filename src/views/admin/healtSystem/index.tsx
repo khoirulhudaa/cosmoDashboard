@@ -26,7 +26,7 @@ const HealthPage: React.FC = () => {
 
   const fetchHealth = async () => {
     try {
-      const res = await fetch("https://vr.kiraproject.id/api/health");
+      const res = await fetch("https://vr.kiraproject.id/health");
       const json = await res.json();
       setHealth(json);
     } catch (err) {

@@ -44,6 +44,8 @@ const ModelScene = React.memo(
       };
     });
 
+    console.log('selectedModel.fullUrl', url)
+
     const groupRef = useRef<THREE.Group>(null);
     const modelRef = useRef<THREE.Group>(null);
     const { camera, gl, raycaster, mouse, scene: threeScene } = useThree();

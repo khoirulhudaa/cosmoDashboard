@@ -3,79 +3,90 @@ import Widget from "components/widget/Widget";
 import React, { useEffect, useMemo, useState } from "react";
 import { MdAdd, MdDelete, MdEdit, MdPeople, MdPerson, MdSearch } from "react-icons/md";
 
-type Role =
-  | "Superadmin"
-  | "Ketua RW"
-  | "Sekretaris RW"
-  | "Ketua Kader"
-  | "Sekretaris Kader"
-  | "Ketua RT"
-  | "Sekretaris RT";
+// Mapping role frontend ke backend
+const roleMap: Record<string, string> = {
+  admin: "ADMIN",
+  superAdmin: "SUPER_ADMIN",
+};
+
+const reverseRoleMap: Record<string, string> = {
+  ADMIN: "admin",
+  SUPER_ADMIN: "superAdmin",
+};
+
+const roleOptions = [
+  { value: "admin", label: "Admin" },
+  { value: "superAdmin", label: "Super Admin" },
+];
 
 interface Admin {
   id: string;
   nama: string;
   email: string;
-  noHp: string;
-  role: Role;
+  noHp?: string;
+  role: string; // "admin" atau "superAdmin"
   aktif: boolean;
 }
 
-const roleOptions: { value: Role; label: string }[] = [
-  { value: "Superadmin", label: "Superadmin" },
-  { value: "Ketua RW", label: "Ketua RW" },
-  { value: "Sekretaris RW", label: "Sekretaris RW" },
-  { value: "Ketua Kader", label: "Ketua Kader" },
-  { value: "Sekretaris Kader", label: "Sekretaris Kader" },
-  { value: "Ketua RT", label: "Ketua RT" },
-  { value: "Sekretaris RT", label: "Sekretaris RT" },
-];
+const API_BASE = "https://vr.kiraproject.id/api/admin/users";
 
 const AdminPage: React.FC = () => {
   const [adminList, setAdminList] = useState<Admin[]>([]);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Admin | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     nama: "",
     email: "",
     noHp: "",
-    role: "Ketua RT" as Role,
+    role: "admin" as string,
     aktif: true,
   });
 
-  // Load dari localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("adminList");
-    if (saved && JSON.parse(saved).length > 0) {
-      setAdminList(JSON.parse(saved));
-    } else {
-      const dummyData: Admin[] = [
-        {
-          id: "1",
-          nama: "Ahmad Fauzi",
-          email: "ahmad@rw01.com",
-          noHp: "081234567890",
-          role: "Superadmin",
-          aktif: true,
-        },
-        {
-          id: "2",
-          nama: "Siti Nurhaliza",
-          email: "siti.rt02@rw01.com",
-          noHp: "085678901234",
-          role: "Ketua RT",
-          aktif: false,
-        },
-      ];
-      setAdminList(dummyData);
-    }
-  }, []);
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  // Simpan ke localStorage
+  // Fetch all admins
+  const fetchAdmins = async () => {
+    if (!token) {
+      setError("Token tidak ditemukan. Silakan login.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(API_BASE, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        const mapped = data.data.map((item: any) => ({
+          id: item.id.toString(),
+          nama: item.name,
+          email: item.email,
+          noHp: item.phone || "",
+          role: reverseRoleMap[item.role] || "admin",
+          aktif: item.isActive,
+        }));
+        setAdminList(mapped);
+      } else {
+        setError(data.message || "Gagal mengambil data");
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan jaringan");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem("adminList", JSON.stringify(adminList));
-  }, [adminList]);
+    fetchAdmins();
+  }, []);
 
   // Filter pencarian
   const filteredData = useMemo(() => {
@@ -87,34 +98,76 @@ const AdminPage: React.FC = () => {
     );
   }, [adminList, search]);
 
-  // Submit form
-  const handleSubmit = () => {
+  // Submit form (Create / Update)
+  const handleSubmit = async () => {
     if (!form.nama.trim() || !form.email.trim()) {
       alert("Nama dan Email wajib diisi!");
       return;
     }
 
-    if (editItem) {
-      setAdminList((prev) =>
-        prev.map((item) =>
-          item.id === editItem.id ? { ...item, ...form } : item
-        )
-      );
-    } else {
-      const newAdmin: Admin = {
-        id: Date.now().toString(),
-        ...form,
-      };
-      setAdminList((prev) => [...prev, newAdmin]);
-    }
+    setLoading(true);
+    try {
+      const url = editItem ? `${API_BASE}/${editItem.id}` : API_BASE;
+      const method = editItem ? "PUT" : "POST";
 
-    closeModal();
+      const body: any = {
+        name: form.nama,
+        role: roleMap[form.role],
+        isActive: form.aktif,
+      };
+
+      if (!editItem) {
+        body.email = form.email;
+        body.password = "DefaultPass123!"; // Bisa diganti jadi input
+      }
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        await fetchAdmins();
+        closeModal();
+      } else {
+        alert(result.message || "Gagal menyimpan data");
+      }
+    } catch (err) {
+      alert("Terjadi kesalahan jaringan");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Hapus admin
-  const handleDelete = (id: string) => {
-    if (window.confirm("Hapus admin ini?")) {
-      setAdminList((prev) => prev.filter((item) => item.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Hapus admin ini?")) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        setAdminList((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        const data = await res.json();
+        alert(data.message || "Gagal menghapus");
+      }
+    } catch (err) {
+      alert("Terjadi kesalahan jaringan");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -124,7 +177,7 @@ const AdminPage: React.FC = () => {
     setForm({
       nama: item.nama,
       email: item.email,
-      noHp: item.noHp,
+      noHp: item.noHp || "",
       role: item.role,
       aktif: item.aktif,
     });
@@ -139,13 +192,29 @@ const AdminPage: React.FC = () => {
       nama: "",
       email: "",
       noHp: "",
-      role: "Ketua RT",
+      role: "admin",
       aktif: true,
     });
   };
 
   return (
     <div>
+      {/* Error Alert */}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <p className="text-sm">Memproses...</p>
+          </div>
+        </div>
+      )}
+
       {/* Widget Statistik */}
       <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4">
         <Widget
@@ -165,8 +234,8 @@ const AdminPage: React.FC = () => {
         />
         <Widget
           icon={<MdPerson className="h-7 w-7" />}
-          title="Superadmin"
-          subtitle={adminList.filter((a) => a.role === "Superadmin").length.toString()}
+          title="Super Admin"
+          subtitle={adminList.filter((a) => a.role === "superAdmin").length.toString()}
         />
       </div>
 
@@ -237,7 +306,7 @@ const AdminPage: React.FC = () => {
                       colSpan={6}
                       className="px-4 py-12 text-center text-sm text-gray-500"
                     >
-                      Belum ada admin terdaftar.
+                      {loading ? "Memuat data..." : "Belum ada admin terdaftar."}
                     </td>
                   </tr>
                 ) : (
@@ -257,13 +326,13 @@ const AdminPage: React.FC = () => {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                            className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
-                                ["Superadmin", "Ketua RW", "Ketua Kader", "Ketua RT"].includes(item.role)
-                                ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
-                                : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                            }`}
-                            >
-                            {item.role}
+                          className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${
+                            item.role === "superAdmin"
+                              ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                              : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                          }`}
+                        >
+                          {item.role === "superAdmin" ? "Super Admin" : "Admin"}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -283,6 +352,7 @@ const AdminPage: React.FC = () => {
                             onClick={() => openEdit(item)}
                             className="text-blue-500 hover:text-blue-700 transition-colors"
                             title="Edit"
+                            disabled={loading}
                           >
                             <MdEdit className="h-5 w-5" />
                           </button>
@@ -290,6 +360,7 @@ const AdminPage: React.FC = () => {
                             onClick={() => handleDelete(item.id)}
                             className="text-red-500 hover:text-red-700 transition-colors"
                             title="Hapus"
+                            disabled={loading}
                           >
                             <MdDelete className="h-5 w-5" />
                           </button>
@@ -342,7 +413,11 @@ const AdminPage: React.FC = () => {
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:border-navy-600 dark:bg-navy-700 dark:text-white"
                   placeholder="contoh@email.com"
+                  disabled={!!editItem}
                 />
+                {editItem && (
+                  <p className="text-xs text-gray-500 mt-1">Email tidak bisa diubah</p>
+                )}
               </div>
 
               {/* No HP */}
@@ -366,7 +441,7 @@ const AdminPage: React.FC = () => {
                 </label>
                 <select
                   value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value as Role })}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
                   className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:border-navy-600 dark:bg-navy-700 dark:text-white"
                 >
                   {roleOptions.map((opt) => (
@@ -402,10 +477,10 @@ const AdminPage: React.FC = () => {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={!form.nama.trim() || !form.email.trim()}
+                disabled={loading || !form.nama.trim() || (!editItem && !form.email.trim())}
                 className="rounded-lg bg-brand-500 px-4 py-2 text-white hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {editItem ? "Simpan Perubahan" : "Tambah Admin"}
+                {loading ? "Menyimpan..." : editItem ? "Simpan Perubahan" : "Tambah Admin"}
               </button>
             </div>
           </Card>

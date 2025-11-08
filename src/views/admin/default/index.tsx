@@ -1,11 +1,10 @@
-import MiniCalendar from "components/calendar/MiniCalendar";
-import Widget from "components/widget/Widget";
-import Card from "components/card";
-import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { MdQrCode, MdVisibility, MdHealthAndSafety, MdModelTraining, MdDownload, MdAdd, MdLink } from "react-icons/md";
-import { IoDocuments } from "react-icons/io5";
-import Chart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
+import Card from "components/card";
+import Widget from "components/widget/Widget";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Chart from "react-apexcharts";
+import { IoDocuments } from "react-icons/io5";
+import { MdAdd, MdDownload, MdHealthAndSafety, MdLink, MdModelTraining, MdPeople, MdQrCode, MdVisibility } from "react-icons/md";
 
 // === TYPES ===
 type Product = {
@@ -49,11 +48,22 @@ type QRGenerateResponse = {
   url: string;
 };
 
+type AdminUser = {
+  id: number;
+  email: string;
+  name: string;
+  role: "ADMIN" | "SUPER_ADMIN";
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 const Dashboard: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [analytics, setAnalytics] = useState<ScanAnalytics | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
   const [models, setModels] = useState<Model[]>([]);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [qrCount, setQrCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [generatingQR, setGeneratingQR] = useState(false);
@@ -69,34 +79,41 @@ const Dashboard: React.FC = () => {
     price: "",
   });
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
   // === FETCH DATA ===
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [pRes, aRes, hRes, mRes] = await Promise.all([
+      const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const [pRes, aRes, hRes, mRes, adminRes] = await Promise.all([
         fetch("https://vr.kiraproject.id/api/products"),
         fetch("https://vr.kiraproject.id/api/scans/analytics"),
-        fetch("https://vr.kiraproject.id/api/health"),
+        fetch("https://vr.kiraproject.id/health"),
         fetch("https://vr.kiraproject.id/api/models"),
+        token ? fetch("https://vr.kiraproject.id/api/admin/users", { headers }) : Promise.resolve(null),
       ]);
 
-      const [pJson, aJson, hJson, mJson] = await Promise.all([
+      const [pJson, aJson, hJson, mJson, adminJson] = await Promise.all([
         pRes.json(),
         aRes.json(),
         hRes.json(),
         mRes.json(),
+        adminRes ? adminRes.json() : null,
       ]);
 
       if (pJson.success) setProducts(pJson.data);
       if (aJson.success) setAnalytics(aJson.data);
       if (hJson.success) setHealth(hJson);
       if (mJson.success) setModels(mJson.data);
+      if (adminJson?.success) setAdminUsers(adminJson.data);
     } catch (err) {
       console.error("Dashboard load failed", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchAll();
@@ -151,7 +168,7 @@ const Dashboard: React.FC = () => {
     if (!modelUrl) return;
 
     try {
-      const res = await fetch(`/api/products/${productId}`, {
+      const res = await fetch(`https://vr.kiraproject.id/api/products/${productId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ modelUrl }),
@@ -172,8 +189,8 @@ const Dashboard: React.FC = () => {
     const oilProducts = products.filter(p => p.category === "OIL").length;
     const totalModels = models.length;
     const totalModelSize = (models.reduce((a, m) => a + m.size, 0) / 1024 / 1024).toFixed(1);
-    return { totalScans, totalProducts, oilProducts, totalModels, totalModelSize, qrCount };
-  }, [analytics, products, models, qrCount]);
+    return { totalScans, totalProducts, oilProducts, totalModels, totalModelSize, qrCount, totalAdmins: adminUsers.length };
+  }, [analytics, products, models, qrCount, adminUsers]);
 
   // === CHARTS ===
   const barChartOptions: ApexOptions = {
@@ -251,7 +268,7 @@ const Dashboard: React.FC = () => {
         </Card>
       </div>
 
-      {/* === TABEL & KALENDER === */}
+      {/* === TABEL PRODUK & ADMIN === */}
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-1">
         {/* Tabel Produk */}
         <Card extra="w-full p-5">
@@ -326,6 +343,69 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </Card>
+
+        {/* Tabel Admin */}
+        {token && (
+          <Card extra="w-full p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-semibold text-navy-700 dark:text-white">Data Admin</h4>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full table-auto">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-navy-600">
+                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-600 dark:text-white">NAMA</th>
+                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-600 dark:text-white">EMAIL</th>
+                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-600 dark:text-white">ROLE</th>
+                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-600 dark:text-white">STATUS</th>
+                    <th className="px-3 py-2 text-left text-xs font-bold text-gray-600 dark:text-white">DIBUAT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-3 py-8 text-center text-sm text-gray-500">
+                        Belum ada admin terdaftar.
+                      </td>
+                    </tr>
+                  ) : (
+                    adminUsers.map((admin) => (
+                      <tr key={admin.id} className="border-b border-gray-100 dark:border-navy-700">
+                        <td className="px-3 py-2 text-sm font-medium">{admin.name}</td>
+                        <td className="px-3 py-2 text-xs text-gray-600 dark:text-gray-400">{admin.email}</td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${
+                              admin.role === "SUPER_ADMIN"
+                                ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+                                : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                            }`}
+                          >
+                            {admin.role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`rounded-full px-2 py-1 text-xs font-medium ${
+                              admin.isActive
+                                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                                : "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                            }`}
+                          >
+                            {admin.isActive ? "Aktif" : "Nonaktif"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-gray-500">
+                          {new Date(admin.createdAt).toLocaleDateString("id-ID")}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
       </div>
 
       {/* === MODAL TAMBAH PRODUK === */}
