@@ -50,6 +50,16 @@ const ProductsPage: React.FC = () => {
     status: "ACTIVE" as Product["status"],
   });
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  // === REDIRECT JIKA TIDAK ADA TOKEN ===
+  useEffect(() => {
+    if (!token || !user) {
+      window.location.href = "/auth/sign-in";
+    }
+  }, [token, user]);
+
   // Load products & models
   useEffect(() => {
     fetchProducts();

@@ -1,10 +1,20 @@
 // src/views/admin/profile/ProfileOverview.tsx
 import Banner from "./components/Banner";
 import General from "./components/General";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ProfileOverview = () => {
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  // === REDIRECT JIKA TIDAK ADA TOKEN ===
+  useEffect(() => {
+    if (!token || !user) {
+      window.location.href = "/auth/sign-in";
+    }
+  }, [token, user]);
 
   const handleProfileUpdate = () => {
     setRefreshKey((prev) => prev + 1);
@@ -13,7 +23,7 @@ const ProfileOverview = () => {
   return (
     <div className="flex w-full flex-col gap-5">
       {/* Banner */}
-      <div className="w-full mt-3 flex h-fit flex-col gap-5 lg:grid lg:grid-cols-12">
+      <div className="w-full flex h-fit flex-col gap-5 lg:grid lg:grid-cols-12">
         <div className="col-span-12 lg:!mb-0">
           <Banner key={`banner-${refreshKey}`} onUpdate={handleProfileUpdate} />
         </div>

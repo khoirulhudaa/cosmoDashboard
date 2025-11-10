@@ -17,6 +17,7 @@ import AdminPage from "views/admin/manajemenAdmin";
 import SignIn from "views/auth/SignIn";
 import ProfileOverview from "views/admin/profile";
 import ARViewerPage from "views/admin/ThreeDModel/ARViewerPage";
+import ARViewerQrCode from "views/admin/arViewer";
 
 const routes: any = [
   // ==================== DASHBOARD ====================
@@ -78,6 +79,11 @@ const routes: any = [
   //   icon: <MdScanner className="h-6 w-6" />,
   //   component: <AnalyticsPage />,
   // },
+  {
+    path: "ar/:sku",      // ← Dynamic SKU
+    component: <ARViewerQrCode />,
+    public: true,         // ← Tandai sebagai public (opsional)
+  },
   {
     layout: "/admin",
     path: "ar",

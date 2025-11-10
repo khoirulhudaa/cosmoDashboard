@@ -2,9 +2,8 @@ import type { ApexOptions } from "apexcharts";
 import Card from "components/card";
 import Widget from "components/widget/Widget";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Chart from "react-apexcharts";
 import { IoDocuments } from "react-icons/io5";
-import { MdAdd, MdDownload, MdHealthAndSafety, MdLink, MdModelTraining, MdPeople, MdQrCode, MdVisibility } from "react-icons/md";
+import { MdAdd, MdHealthAndSafety, MdLink, MdModelTraining, MdQrCode } from "react-icons/md";
 
 // === TYPES ===
 type Product = {
@@ -80,6 +79,14 @@ const Dashboard: React.FC = () => {
   });
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  // === REDIRECT JIKA TIDAK ADA TOKEN ===
+  useEffect(() => {
+    if (!token || !user) {
+      window.location.href = "/auth/sign-in";
+    }
+  }, [token, user]);
 
   // === FETCH DATA ===
   const fetchAll = useCallback(async () => {
@@ -232,11 +239,11 @@ const Dashboard: React.FC = () => {
   return (
     <div>
       {/* === WIDGETS === */}
-      <div className="mt-0 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
+      <div className="mt-0 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4 3xl:grid-cols-6">
         <Widget icon={<MdQrCode className="h-7 w-7" />} title="Total Produk" subtitle={stats.totalProducts.toString()} />
-        <Widget icon={<MdVisibility className="h-7 w-7 text-blue-500" />} title="Total Scan" subtitle={stats.totalScans.toString()} />
+        {/* <Widget icon={<MdVisibility className="h-7 w-7 text-blue-500" />} title="Total Scan" subtitle={stats.totalScans.toString()} /> */}
         <Widget icon={<MdModelTraining className="h-7 w-7 text-green-500" />} title="Model 3D" subtitle={stats.totalModels.toString()} />
-        <Widget
+        {/* <Widget
           icon={<MdDownload className="h-7 w-7 text-purple-500" />}
           title="QR Generated"
           subtitle={qrCount.toString()}
@@ -249,13 +256,13 @@ const Dashboard: React.FC = () => {
               {generatingQR ? "..." : "Generate All"}
             </button>
           }
-        />
+        /> */}
         <Widget icon={<MdHealthAndSafety className="h-7 w-7 text-orange-500" />} title="Backend" subtitle={health?.success ? "Online" : "Offline"} />
         <Widget icon={<IoDocuments className="h-6 w-6" />} title="Storage Model" subtitle={`${stats.totalModelSize} MB`} />
       </div>
 
       {/* === CHARTS === */}
-      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+      {/* <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
         <Card extra="p-5">
           <div className="h-80">
             <Chart options={barChartOptions} series={barChartSeries} type="bar" height="100%" />
@@ -266,7 +273,7 @@ const Dashboard: React.FC = () => {
             <Chart options={donutChartOptions} series={donutChartSeries} type="donut" height="100%" />
           </div>
         </Card>
-      </div>
+      </div> */}
 
       {/* === TABEL PRODUK & ADMIN === */}
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-1">

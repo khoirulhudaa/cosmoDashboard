@@ -42,6 +42,16 @@ const ModelsPage: React.FC = () => {
   const [maxDist, setMaxDist] = useState(350);
   const [autoRotate, setAutoRotate] = useState(false);
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  // === REDIRECT JIKA TIDAK ADA TOKEN ===
+  useEffect(() => {
+    if (!token || !user) {
+      window.location.href = "/auth/sign-in";
+    }
+  }, [token, user]);
+
   useEffect(() => {
     fetchModels();
   }, []);

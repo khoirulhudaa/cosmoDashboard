@@ -2,7 +2,7 @@ import authImg from "assets/img/auth/auth.jpg";
 import Checkbox from "components/checkbox";
 import InputField from "components/fields/InputField";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -12,6 +12,18 @@ export default function SignIn() {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+
+  // === OTOMATIS REDIRECT JIKA SUDAH LOGIN ===
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+    if (token && user) {
+      // Hapus jika ingin "force logout" saat buka login
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -46,6 +46,14 @@ const AdminPage: React.FC = () => {
   });
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  // === REDIRECT JIKA TIDAK ADA TOKEN ===
+  useEffect(() => {
+    if (!token || !user) {
+      window.location.href = "/auth/sign-in";
+    }
+  }, [token, user]);
 
   // Fetch all admins
   const fetchAdmins = async () => {
@@ -216,7 +224,7 @@ const AdminPage: React.FC = () => {
       )}
 
       {/* Widget Statistik */}
-      <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-4">
         <Widget
           icon={<MdPeople className="h-7 w-7" />}
           title="Total Admin"

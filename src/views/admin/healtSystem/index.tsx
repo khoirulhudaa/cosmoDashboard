@@ -18,6 +18,16 @@ type Health = {
 const HealthPage: React.FC = () => {
   const [health, setHealth] = useState<Health | null>(null);
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+
+  // === REDIRECT JIKA TIDAK ADA TOKEN ===
+  useEffect(() => {
+    if (!token || !user) {
+      window.location.href = "/auth/sign-in";
+    }
+  }, [token, user]);
+
   useEffect(() => {
     fetchHealth();
     const interval = setInterval(fetchHealth, 10000);
