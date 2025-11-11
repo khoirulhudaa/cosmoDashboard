@@ -1,8 +1,8 @@
 // src/views/admin/ARViewerPage.tsx
 import React, { useEffect, useState } from "react";
+import { MdClose } from "react-icons/md";
 import { useSearchParams } from "react-router-dom";
 import ThreeDModel from "../ThreeDModel";
-import { MdClose } from "react-icons/md";
 
 interface ProductModel {
   sku: string;

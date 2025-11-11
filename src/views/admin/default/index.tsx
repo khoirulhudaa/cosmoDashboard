@@ -1,4 +1,3 @@
-import type { ApexOptions } from "apexcharts";
 import Card from "components/card";
 import Widget from "components/widget/Widget";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -40,13 +39,6 @@ type Model = {
   modifiedAt: string;
 };
 
-type QRGenerateResponse = {
-  sku: string;
-  name: string;
-  qrCode: string;
-  url: string;
-};
-
 type AdminUser = {
   id: number;
   email: string;
@@ -63,9 +55,7 @@ const Dashboard: React.FC = () => {
   const [health, setHealth] = useState<Health | null>(null);
   const [models, setModels] = useState<Model[]>([]);
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
-  const [qrCount, setQrCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [generatingQR, setGeneratingQR] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [dragOverId, setDragOverId] = useState<number | null>(null);
 
@@ -128,23 +118,6 @@ const Dashboard: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchAll]);
 
-  // === GENERATE ALL QR ===
-  const generateAllQR = async () => {
-    setGeneratingQR(true);
-    try {
-      const res = await fetch("https://vr.kiraproject.id/api/products/qr/generate-all", { method: "POST" });
-      const json = await res.json();
-      if (json.success) {
-        setQrCount(json.data.length);
-        alert(`Berhasil generate ${json.data.length} QR Code!`);
-      }
-    } catch (err) {
-      alert("Gagal generate QR");
-    } finally {
-      setGeneratingQR(false);
-    }
-  };
-
   // === CREATE PRODUCT ===
   const createProduct = async () => {
     if (!newProduct.sku || !newProduct.name) return alert("SKU & Nama wajib diisi");
@@ -196,36 +169,8 @@ const Dashboard: React.FC = () => {
     const oilProducts = products.filter(p => p.category === "OIL").length;
     const totalModels = models.length;
     const totalModelSize = (models.reduce((a, m) => a + m.size, 0) / 1024 / 1024).toFixed(1);
-    return { totalScans, totalProducts, oilProducts, totalModels, totalModelSize, qrCount, totalAdmins: adminUsers.length };
-  }, [analytics, products, models, qrCount, adminUsers]);
-
-  // === CHARTS ===
-  const barChartOptions: ApexOptions = {
-    chart: { type: "bar", height: 350, toolbar: { show: false } },
-    plotOptions: { bar: { horizontal: true, borderRadius: 8 } },
-    dataLabels: { enabled: false },
-    xaxis: {
-      categories: analytics?.topProducts.slice(0, 5).map(p => p.sku) || [],
-      labels: { style: { fontSize: "12px" } },
-    },
-    colors: ["#3B82F6"],
-    tooltip: { y: { formatter: (val) => `${val} kali` } },
-    title: { text: "Top 5 Produk Ter-scan", align: "left", style: { fontSize: "16px", fontWeight: 600 } },
-  };
-
-  const barChartSeries = [{ name: "Scan Count", data: analytics?.topProducts.slice(0, 5).map(p => p.scanCount) || [] }];
-
-  const donutChartOptions: ApexOptions = {
-    chart: { type: "donut" },
-    labels: ["OIL", "GENERAL"],
-    colors: ["#3B82F6", "#10B981"],
-    legend: { position: "bottom" },
-    dataLabels: { enabled: false },
-    plotOptions: { pie: { donut: { size: "65%" } } },
-    title: { text: "Distribusi Kategori", align: "left", style: { fontSize: "16px", fontWeight: 600 } },
-  };
-
-  const donutChartSeries = [stats.oilProducts, stats.totalProducts - stats.oilProducts];
+    return { totalScans, totalProducts, oilProducts, totalModels, totalModelSize, totalAdmins: adminUsers.length };
+  }, [analytics, products, models, adminUsers]);
 
   // === LOADING ===
   if (loading) {

@@ -1,23 +1,22 @@
 import MainDashboard from "views/admin/default";
 
 import {
-  MdAddBox, MdAdminPanelSettings, MdCardGiftcard, MdCreditCard, MdFace, // Beranda
+  MdAddBox, MdAdminPanelSettings,
+  MdFace, // Beranda
   MdFamilyRestroom,
-  MdHome, MdMan, MdMode,
-  MdPlusOne, MdScanner,
-  MdSimCard
+  MdHome,
+  MdMode,
+  MdPlusOne
 } from "react-icons/md";
 
 import HealthPage from "views/admin/healtSystem";
+import AdminPage from "views/admin/manajemenAdmin";
 import ModelsPage from "views/admin/manajemenModel";
 import ProductsPage from "views/admin/manajemenProduk";
 import QRCodesPage from "views/admin/manajemenQrCode";
-import AnalyticsPage from "views/admin/scanAnalytics";
-import AdminPage from "views/admin/manajemenAdmin";
-import SignIn from "views/auth/SignIn";
 import ProfileOverview from "views/admin/profile";
 import ARViewerPage from "views/admin/ThreeDModel/ARViewerPage";
-import ARViewerQrCode from "views/admin/arViewer";
+import SignIn from "views/auth/SignIn";
 
 const routes: any = [
   // ==================== DASHBOARD ====================
@@ -79,11 +78,11 @@ const routes: any = [
   //   icon: <MdScanner className="h-6 w-6" />,
   //   component: <AnalyticsPage />,
   // },
-  {
-    path: "ar/:sku",      // ← Dynamic SKU
-    component: <ARViewerQrCode />,
-    public: true,         // ← Tandai sebagai public (opsional)
-  },
+  // {
+  //   path: "ar/:sku",      // ← Dynamic SKU
+  //   component: <ARViewerQrCode />,
+  //   public: true,         // ← Tandai sebagai public (opsional)
+  // },
   {
     layout: "/admin",
     path: "ar",
