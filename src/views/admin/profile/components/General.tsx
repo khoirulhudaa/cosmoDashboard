@@ -55,7 +55,7 @@ const General: React.FC = () => {
         <div className="flex flex-col justify-center rounded-2xl bg-white bg-clip-border px-3 py-4 border border-black/30 dark:!bg-navy-700 dark:border-navy-600">
           <p className="text-sm text-gray-600">Role</p>
           <span
-            className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${
+            className={`inline-block w-max rounded-full px-2.5 py-1 text-xs font-medium ${
               isSuperAdmin
                 ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
                 : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"

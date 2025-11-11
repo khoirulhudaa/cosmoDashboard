@@ -58,7 +58,8 @@ const QRCodesPage = () => {
   // === GENERATE QR DARI SKU (Manual) ===
   useEffect(() => {
     const generateAllQRs = async () => {
-      const baseUrl = 'https://cosmo-dashboard-3d.vercel.app/ar';
+      // const baseUrl = 'https://cosmo-dashboard-3d.vercel.app/ar';
+      const baseUrl = 'https://cosmo.kiraproject.id/ar';
       const qrList: QRItem[] = [];
 
       for (const product of products) {
@@ -128,7 +129,7 @@ const QRCodesPage = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="">
       {/* Widget */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Widget icon={<MdQrCode className="h-7 w-7" />} title="Total QR" subtitle={qrs.length} />

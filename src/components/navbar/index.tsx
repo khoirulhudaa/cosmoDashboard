@@ -1,13 +1,38 @@
+// src/components/navbar/Navbar.tsx
 import Dropdown from "components/dropdown";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
+const routes = [
+  { path: "/admin/default", name: "Halaman Beranda" },
+  { path: "/admin/produk", name: "Manajemen Produk" },
+  { path: "/admin/model", name: "Manajemen Model" },
+  { path: "/admin/kesehatan-sistem", name: "Kesehatan Sistem" },
+  { path: "/admin/data-admin", name: "Manajemen Admin" },
+  { path: "/admin/profile", name: "Akun Pengguna" },
+  { path: "/admin/qrCode", name: "Manajemen QrCode" },
+  { path: "/admin/ar", name: "AR Viewer" },
+  { path: "/auth/sign-in", name: "Login" },
+];
 
 const Navbar = (props: {
   onOpenSidenav: () => void;
-  brandText: string;
+  brandText?: string;
   secondary?: boolean | string;
 }) => {
-
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // === CARI NAMA HALAMAN BERDASARKAN URL ===
+  const getPageTitle = () => {
+    const matchedRoute = routes.find((route) => {
+      const routePath = route.path.replace(":sku", "[^/]+"); // Support dynamic route
+      const regex = new RegExp(`^${routePath}$`);
+      return regex.test(location.pathname);
+    });
+    return matchedRoute?.name || "Dashboard Cosmo";
+  };
+
+  const pageTitle = getPageTitle();
 
   return (
     <nav className="sticky border-b border-black/30 top-0 mb-4 z-40 flex flex-row flex-wrap items-center justify-between bg-white/10 px-2 h-[14vh] backdrop-blur-xl dark:bg-[#0b14374d]">
@@ -17,19 +42,22 @@ const Navbar = (props: {
             to="#"
             className="font-bold capitalize hover:text-navy-700 dark:hover:text-white"
           >
-            {"MANAJEMEN COSMO"}
+            {pageTitle}
           </Link>
         </p>
+        <small className="text-gray-700">Pengelolaan data cosmo secara dinamis</small>
       </div>
 
       <div className="relative mt-[3px] flex h-[61px] w-max flex-grow items-center justify-around gap-2 rounded-full bg-white px-3 py-2 shadow-xl shadow-shadow-500 dark:!bg-navy-800 dark:shadow-none md:flex-grow-0 md:gap-1 xl:gap-2">
-        <p className="border border-black/50 bg-brand-100/50 text-brand-800 rounded-full mr-2 py-2 px-3">{user.name}</p>
+        <p className="border border-black/50 bg-brand-100/50 text-brand-800 rounded-full mr-2 py-2 px-3">
+          {user.name || "Admin"}
+        </p>
         <Dropdown
           button={
             <img
               className="h-10 w-10 border-2 cursor-pointer active:scale-[0.98] hover:brightness-95 border-brand-100 rounded-full"
-              src={'/defaultProfile.png'}
-              alt="Elon Musk"
+              src="/defaultProfile.png"
+              alt="Profile"
             />
           }
           children={
@@ -37,25 +65,26 @@ const Navbar = (props: {
               <div className="mt-3 ml-4">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-bold text-navy-700 dark:text-white">
-                    👋 Hey, Adela
-                  </p>{" "}
+                    Hai, {user.name || "Admin"}
+                  </p>
                 </div>
               </div>
-              <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20 " />
+              <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20" />
 
               <div className="mt-3 ml-4 flex flex-col">
-                <a
-                  href="/admin/profile"
+                <Link
+                  to="/admin/profile"
                   className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
                 >
                   Profile Akun
-                </a>
-                <a
-                  href="/auth/sign-in"
+                </Link>
+                <Link
+                  to="/auth/sign-in"
                   className="mt-3 text-sm font-medium text-red-500 hover:text-red-500"
+                  onClick={() => localStorage.clear()}
                 >
                   Log Out
-                </a>
+                </Link>
               </div>
             </div>
           }

@@ -27,12 +27,12 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
       {/* Logo */}
       <div className="mx-auto border-b h-[15%] flex justify-start items-center border-black/50 w-[90%]">
         <div className="flex items-center gap-3 rounded-lg bg-white/70 px-3 backdrop-blur-sm dark:bg-navy-800/70">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-brand-500/20 text-brand-500 dark:bg-brand-500/30">
-            <MdPeople className="h-6 w-6" />
+          <div className="flex items-center justify-start rounded-md">
+            <img src="/logo.jpg" className="w-[60%]" alt="logo-cosmo" />
           </div>
-          <h1 className="font-poppins text-xl font-bold uppercase text-navy-700 dark:text-white">
+          {/* <h1 className="font-poppins text-xl font-bold uppercase text-navy-700 dark:text-white">
             COSMO <span className="font-medium"></span>
-          </h1>
+          </h1> */}
         </div>
       </div>
 

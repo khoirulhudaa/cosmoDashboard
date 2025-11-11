@@ -93,28 +93,6 @@ const routes: any = [
     path: "sign-in",
     component: <SignIn />,
   },
-  // {
-  //   name: "Bantuan Kelurahan",
-  //   layout: "/admin",
-  //   path: "bantuan-kelurahan",
-  //   icon: <MdCardGiftcard className="h-6 w-6" />,
-  //   subRoutes: [
-  //     {
-  //       name: "Jenis Bantuan",
-  //       layout: "/admin",
-  //       path: "jenis-bantuan",
-  //       icon: <MdCategory className="h-6 w-6" />,
-  //       component: <JenisBantuanPage />,
-  //     },
-  //     {
-  //       name: "Penerima",
-  //       layout: "/admin",
-  //       path: "penerima-bantuan",
-  //       icon: <MdPeople className="h-6 w-6" />,
-  //       component: <PenerimaBantuan />,
-  //     },
-  //   ],
-  // },
 ];
 
 export default routes;

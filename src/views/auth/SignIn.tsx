@@ -72,8 +72,8 @@ export default function SignIn() {
   return (
     <div className="relative grid grid-cols-2 h-[100vh] overflow-hidden w-full items-center justify-center lg:items-center lg:justify-start">
       {/* Sign in section */}
-      <div className="flex items-center justify-center py-10 overflow-hidden h-full px-14">
-        <div className="relative h-full p-10 shadow-lg border border-black/30 rounded-lg w-full max-w-full flex-col items-center">
+      <div className="flex items-center justify-center py-10 bg-gray-100/60 overflow-hidden h-full px-14">
+        <div className="relative h-full bg-white p-10 shadow-lg border border-black/30 rounded-lg w-full max-w-full flex-col items-center">
           <Link to="/" className="mt-0 w-max lg:pt-10">
             <div className="mx-auto flex h-fit mb-6 w-screen items-center hover:cursor-pointer">
               <svg
@@ -97,7 +97,7 @@ export default function SignIn() {
           <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
             Masuk
           </h4>
-          <p className="mb-9 ml-1 text-base text-gray-600">
+          <p className="mb-9 ml-1 text-base text-gray-800">
             Masukkan email dan kata sandi untuk masuk!
           </p>
 
