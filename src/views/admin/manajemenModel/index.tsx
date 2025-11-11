@@ -1,4 +1,3 @@
-// src/views/admin/ModelsPage.tsx
 import Card from "components/card";
 import Widget from "components/widget/Widget";
 import React, {
@@ -34,7 +33,6 @@ const ModelsPage: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadProgress, setLoadProgress] = useState(0);
 
   // Kontrol kamera
   const modelRef = useRef<ThreeDModelRef>(null);
@@ -101,16 +99,11 @@ const ModelsPage: React.FC = () => {
     setIsModalOpen(false);
     setSelectedModel(null);
     setIsLoading(false);
-    setLoadProgress(0);
   };
 
   const handleCameraChange = (pos: [number, number, number], maxD: number) => {
     setCameraPos(pos.map((p) => Number(p.toFixed(2))) as [number, number, number]);
     setMaxDist(maxD);
-  };
-
-  const resetCamera = () => {
-    modelRef.current?.resetCamera();
   };
 
   // Loader Modern (tanpa progress bar)

@@ -269,7 +269,7 @@ const Dashboard: React.FC = () => {
                       </td>
                       <td className="px-3 py-2 text-xs">
                         {p.modelUrl ? (
-                          <a href={p.modelUrl} target="_blank" className="text-green-600 hover:underline flex items-center gap-1">
+                          <a href={p.modelUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 hover:underline flex items-center gap-1">
                             <MdLink className="w-3 h-3" /> Ada
                           </a>
                         ) : (

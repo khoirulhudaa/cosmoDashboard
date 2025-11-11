@@ -1,10 +1,7 @@
-// src/pages/admin/QRCodesPage.tsx
-'use client';
-
 import Card from 'components/card';
 import Widget from 'components/widget/Widget';
 import { useEffect, useMemo, useState } from 'react';
-import { MdDownload, MdQrCode, MdRefresh, MdSearch, MdClose } from 'react-icons/md';
+import { MdClose, MdDownload, MdQrCode, MdRefresh, MdSearch } from 'react-icons/md';
 import { generateQRWithLogo } from 'utils';
 import ThreeDModel from '../ThreeDModel';
 

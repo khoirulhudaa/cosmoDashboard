@@ -1,6 +1,6 @@
 import Card from "components/card";
 import Widget from "components/widget/Widget";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { MdAdd, MdDelete, MdEdit, MdPeople, MdPerson, MdSearch } from "react-icons/md";
 
 // Mapping role frontend ke backend
@@ -56,7 +56,7 @@ const AdminPage: React.FC = () => {
   }, [token, user]);
 
   // Fetch all admins
-  const fetchAdmins = async () => {
+  const fetchAdmins = useCallback(async () => {
     if (!token) {
       setError("Token tidak ditemukan. Silakan login.");
       return;
@@ -90,11 +90,11 @@ const AdminPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); 
 
   useEffect(() => {
     fetchAdmins();
-  }, []);
+  }, [fetchAdmins]);
 
   // Filter pencarian
   const filteredData = useMemo(() => {

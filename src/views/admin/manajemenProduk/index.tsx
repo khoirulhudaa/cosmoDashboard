@@ -3,7 +3,7 @@ import Widget from "components/widget/Widget";
 import React, { useEffect, useMemo, useState } from "react";
 import { BsCheck } from "react-icons/bs";
 import { IoClose } from "react-icons/io5";
-import { MdAdd, MdDelete, MdEdit, MdQrCode, MdSearch, MdVisibility } from "react-icons/md";
+import { MdAdd, MdEdit, MdQrCode, MdSearch, MdVisibility } from "react-icons/md";
 
 type Product = {
   id: number;
@@ -148,16 +148,6 @@ const ProductsPage: React.FC = () => {
       }
     } catch (err) {
       alert("Gagal menyimpan produk");
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("Hapus produk ini?")) return;
-    try {
-      await fetch(`https://vr.kiraproject.id/products/${id}`, { method: "DELETE" });
-      fetchProducts();
-    } catch (err) {
-      alert("Gagal menghapus");
     }
   };
 

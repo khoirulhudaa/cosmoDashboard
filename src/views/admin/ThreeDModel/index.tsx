@@ -44,13 +44,11 @@ const ModelScene = React.memo(
       };
     });
 
-    console.log('selectedModel.fullUrl', url)
-
     const groupRef = useRef<THREE.Group>(null);
     const modelRef = useRef<THREE.Group>(null);
-    const { camera, gl, raycaster, mouse, scene: threeScene } = useThree();
+    const { camera, gl, raycaster, mouse } = useThree(); // Hapus threeScene
 
-    // Auto-fit
+    // Auto-fit camera
     useEffect(() => {
       if (!modelRef.current || !scene) return;
 
@@ -59,19 +57,14 @@ const ModelScene = React.memo(
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
 
-      groupRef.current.position.set(-center.x, -center.y, -center.z);
-      
-      const cameras = camera as any;
-      const distance = maxDim / Math.tan((cameras.fov * Math.PI) / 180 / 2);
-      // if (camera.type === "PerspectiveCamera") {
-      //   const fovRad = (cameras.fov * Math.PI) / 180;
-      // }
+      groupRef.current!.position.set(-center.x, -center.y, -center.z);
 
+      const distance = maxDim * 1.5; // Lebih aman dari rumus kompleks
       const defaultPos: [number, number, number] = [0, 0, distance];
+
       if (!cameraPosition) {
         camera.position.set(0, 0, distance);
         camera.lookAt(0, 0, 0);
-       
         onCameraChange?.(defaultPos, 350);
       }
 
@@ -87,15 +80,13 @@ const ModelScene = React.memo(
       }
     }, [cameraPosition, camera]);
 
-    // Update maxDistance & autoRotate
+    // Update OrbitControls
     useEffect(() => {
       const controls = (gl.domElement as any)._orbitControls;
       if (controls) {
         if (maxDistance !== undefined) controls.maxDistance = maxDistance;
-        if (autoRotate !== undefined) {
-          controls.target.set(0, 0, 0);
+        controls.autoRotate = autoRotate ?? false;
         controls.update();
-        }
       }
     }, [maxDistance, autoRotate, gl]);
 
@@ -112,12 +103,10 @@ const ModelScene = React.memo(
         const newDistance = controls.getDistance() * (delta > 0 ? factor : 1 / factor);
         const clampedDistance = Math.max(1, Math.min(newDistance, controls.maxDistance));
 
-        // Ambil posisi mouse
         const rect = gl.domElement.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-        // Raycast ke model
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObject(modelRef.current!, true);
 
@@ -125,21 +114,17 @@ const ModelScene = React.memo(
         if (intersects.length > 0) {
           targetPoint = intersects[0].point;
         } else {
-          // Jika tidak kena model, gunakan arah dari kamera
           const direction = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera).sub(camera.position).normalize();
           targetPoint = camera.position.clone().add(direction.multiplyScalar(clampedDistance));
         }
 
-        // Hitung posisi kamera baru
         const direction = new THREE.Vector3().subVectors(targetPoint, camera.position).normalize();
         const newPosition = targetPoint.clone().sub(direction.multiplyScalar(clampedDistance));
 
-        // Update posisi
         camera.position.copy(newPosition);
         controls.target.copy(targetPoint);
         controls.update();
 
-        // Update state
         onCameraChange?.(
           [camera.position.x, camera.position.y, camera.position.z] as [number, number, number],
           controls.maxDistance
@@ -177,15 +162,6 @@ const ThreeDModel = forwardRef<ThreeDModelRef, ThreeDModelProps>(
   ) => {
     const controlsRef = useRef<any>(null);
 
-    const handleControlsChange = () => {
-      if (!controlsRef.current) return;
-      const cam = controlsRef.current.object;
-      onCameraChange?.(
-        [cam.position.x, cam.position.y, cam.position.z] as [number, number, number],
-        controlsRef.current.maxDistance
-      );
-    };
-
     const resetCamera = () => {
       controlsRef.current?.reset();
     };
@@ -204,17 +180,13 @@ const ThreeDModel = forwardRef<ThreeDModelRef, ThreeDModelProps>(
 
         <OrbitControls
           ref={controlsRef}
-          enableZoom={true}         
+          enableZoom={true}
           enablePan={false}
-          enableDamping={false}      
+          enableDamping={false}
           minDistance={1}
-          maxDistance={350}
+          maxDistance={maxDistance ?? 350}
           autoRotate={autoRotate}
           autoRotateSpeed={1.0}
-          onChange={(e) => {
-            if (!e) return;
-            const cam = e.target.object;
-          }}
         />
 
         <React.Suspense fallback={null}>
